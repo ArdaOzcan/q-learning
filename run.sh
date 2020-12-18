@@ -1,2 +1,6 @@
 #! /usr/bin/bash
-./build.sh && ./bin/main
+cd build
+cmake ..
+make
+cd ..
+./build/qlearning
