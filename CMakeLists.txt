@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.19.2)
 project(qlearning)
 find_package(SFML 2.5.1 COMPONENTS system graphics audio network REQUIRED)
 
-include_directories(src)
+include_directories(include)
 
 file(GLOB SOURCES "src/*.cpp")
 
