@@ -1,8 +1,15 @@
 #include "agent.hpp"
 
+
 Agent::Agent(sf::Color color)
 {
     this->color = color;
+    resetPos();
+}
+
+void Agent::resetPos()
+{
+    pos = sf::Vector2i(11, 11);
 }
 
 sf::Vector2i Agent::getPos()

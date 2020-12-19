@@ -1,4 +1,7 @@
+#pragma once
+
 #include <SFML/Graphics.hpp>
+#include <iostream>
 
 enum Direction
 {
@@ -21,4 +24,5 @@ public:
     sf::Color getColor();
 
     void go(Direction drc);
+    void resetPos();
 };

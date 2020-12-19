@@ -24,8 +24,18 @@ Map::Map(std::string fileName)
 
 bool Map::isObstacle(int x, int y)
 {
+    if(x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT)
+        return true;
+        
     return obstacles[x][y];
 }
+
+
+bool Map::isObstacle(sf::Vector2i v)
+{
+    return isObstacle(v.x, v.y);
+}
+
 
 void Map::serialize(std::string fileName)
 {

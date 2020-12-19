@@ -1,6 +1,6 @@
-#include <SFML/Graphics.hpp>
+#pragma once
 #include "map.hpp"
-#include "agent.hpp"
+
 
 struct Grid
 {
@@ -12,4 +12,5 @@ private:
 public:
     Grid(Map map, Agent *agent);
     void draw(sf::RenderWindow &win);
+    sf::Vector2i getAgentPos();
 };

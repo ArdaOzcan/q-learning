@@ -38,3 +38,8 @@ void Grid::draw(sf::RenderWindow &win)
         }
     }
 }
+
+sf::Vector2i Grid::getAgentPos()
+{
+    return agent->getPos();
+}
