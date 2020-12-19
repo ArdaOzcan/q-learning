@@ -9,7 +9,7 @@ Agent::Agent(sf::Color color)
 
 void Agent::resetPos()
 {
-    pos = sf::Vector2i(11, 11);
+    pos = sf::Vector2i(0, 0);
 }
 
 sf::Vector2i Agent::getPos()

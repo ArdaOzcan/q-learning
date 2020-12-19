@@ -11,6 +11,8 @@ private:
 
 public:
     Grid(Map map, Agent *agent);
+
     void draw(sf::RenderWindow &win);
     sf::Vector2i getAgentPos();
+    bool isObstacle(sf::Vector2i v);
 };

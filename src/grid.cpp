@@ -20,9 +20,9 @@ Grid::Grid(Map map, Agent *agent)
 
 void Grid::draw(sf::RenderWindow &win)
 {
-    for (size_t x = 0; x < 20; x++)
+    for (size_t x = 0; x < GRID_WIDTH; x++)
     {
-        for (size_t y = 0; y < 20; y++)
+        for (size_t y = 0; y < GRID_HEIGHT; y++)
         {
             if (agent->getPos() == sf::Vector2i(x, y))
             {
@@ -37,6 +37,11 @@ void Grid::draw(sf::RenderWindow &win)
             }
         }
     }
+}
+
+bool Grid::isObstacle(sf::Vector2i v)
+{
+    return map.isObstacle(v);
 }
 
 sf::Vector2i Grid::getAgentPos()

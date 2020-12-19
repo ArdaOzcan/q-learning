@@ -1,9 +1,10 @@
 #pragma once
 
-#define GRID_WIDTH 20
-#define GRID_HEIGHT 20
+#define GRID_WIDTH 40
+#define GRID_HEIGHT 40
 #define ACTION_AMOUNT 4
 
-#define EPISODES 2500
+#define EPISODES 2500000
+#define START_EPSILON 0.6
 #define LEARNING_RATE 0.3
-#define DISCOUNT 0.7
+#define DISCOUNT 0.9

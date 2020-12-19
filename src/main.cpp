@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <math.h>
 
 #include "table.hpp"
 
@@ -7,6 +8,11 @@ std::string vectorToString(sf::Vector2i v)
 {
     std::string ret = "(" + std::to_string(v.x) + ", " + std::to_string(v.y) + ")";
     return ret;
+}
+
+float getDifference(sf::Vector2i v1, sf::Vector2i v2)
+{
+    return std::sqrt(std::pow(std::abs(v1.x - v2.x), 2) + std::pow(std::abs(v1.y - v2.y), 2));
 }
 
 std::string directionToString(Direction drc)
@@ -26,47 +32,108 @@ std::string directionToString(Direction drc)
     }
 }
 
+void render(Table &table, Agent &agent, Grid &grid, float epsilon)
+{
+    sf::RenderWindow window(sf::VideoMode(400, 400), "Q Learning");
+    window.setFramerateLimit(15);
+
+    agent.resetPos();
+    while (window.isOpen())
+    {
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+                window.close();
+        }
+
+        sf::Vector2i state = grid.getAgentPos();
+
+        float p = (rand() % 100) / 100.0;
+        Direction action;
+        if (p < epsilon)
+        {
+            std::cout << "Chose randomly; ";
+            action = (Direction)(rand() % ACTION_AMOUNT);
+        }
+        else
+        {
+            std::cout << "Chose highest: " << table.getOptimalQValue(state) << "; ";
+            action = (Direction)table.getOptimalQValueIndex(state);
+        }
+
+        agent.go(action);
+        std::cout << "Action: " << directionToString(action) << std::endl;
+        sf::Vector2i newState = grid.getAgentPos();
+
+        if (grid.isObstacle(newState))
+        {
+            std::cout << "Tossed to an obstacle " << vectorToString(newState) << std::endl;
+            window.close();
+        }
+
+        if (newState == sf::Vector2i(GRID_WIDTH - 1, GRID_HEIGHT - 1))
+        {
+            std::cout << "Got the reward" << std::endl;
+            window.close();
+        }
+
+        window.clear();
+        grid.draw(window);
+        window.display();
+    }
+}
+
 int main()
 {
-    // sf::RenderWindow window(sf::VideoMode(200, 200), "Q Learning");
-    // window.setFramerateLimit(1);
-
     Map map = Map("data/test.map");
     Agent agent = Agent();
     Grid grid = Grid(map, &agent);
     Table table = Table();
 
     bool log = false;
-    
-    float epsilon = 0.5;
+
+    float epsilon = START_EPSILON;
 
     int START_EPSILON_DECAYING = 1;
     int END_EPSILON_DECAYING = EPISODES / 2;
-    
-    float epsilonDecayValue = epsilon/(END_EPSILON_DECAYING-START_EPSILON_DECAYING);
+
+    float epsilonDecayValue = epsilon / (END_EPSILON_DECAYING - START_EPSILON_DECAYING);
+    sf::RenderWindow window;
+
+
+    sf::Vector2i target = sf::Vector2i(GRID_WIDTH - 1, GRID_HEIGHT - 1);
 
     for (size_t i = 0; i < EPISODES; i++)
     {
-        log = (i == EPISODES - 1);
-        if (log)
-            std::cout << "Episode: " << i << std::endl;
+        // log = (i == EPISODES - 1);
+        // log = (i % 900000 == 0);
+        
+
+        // if(i % 18000000 == 0) 
+        // {
+        //     render(table, agent, grid, epsilon);
+        // }
+
         agent.resetPos();
         bool episodeEnded = false;
+
         while (!episodeEnded)
         {
             sf::Vector2i state = grid.getAgentPos();
             if (log)
                 std::cout << vectorToString(state) << std::endl;
+
             float p = (rand() % 100) / 100.0;
             Direction action;
             if (p < epsilon)
             {
-                if(log) std::cout << "Chose randomly; ";
+                if (log) std::cout << "Chose randomly; ";
                 action = (Direction)(rand() % ACTION_AMOUNT);
             }
             else
             {
-                if(log) std::cout << "Chose highest: " << table.getOptimalQValue(state) << "; ";
+                if (log) std::cout << "Chose highest: " << table.getOptimalQValue(state) << "; ";
                 action = (Direction)table.getOptimalQValueIndex(state);
             }
 
@@ -75,21 +142,22 @@ int main()
                 std::cout << "Action: " << directionToString(action) << std::endl;
             sf::Vector2i newState = grid.getAgentPos();
 
-            float reward = -5;
+            float reward = -5 + 20/getDifference(newState, target);
             episodeEnded = map.isObstacle(newState);
             if (episodeEnded)
             {
                 if (log)
                     std::cout << "Tossed to an obstacle " << vectorToString(newState) << std::endl;
-                table.setQValue(state, action, -50);
+                table.setQValue(state, action, -100);
                 continue;
             }
 
-            if (newState == sf::Vector2i(GRID_WIDTH - 1, GRID_HEIGHT - 1))
+            if (newState == target)
             {
-                table.setQValue(state, action, 50);
                 episodeEnded = true;
-                std::cout << "Got the reward at " << i << std::endl;
+                if(i > EPISODES - 2500)
+                    std::cout << "Got the reward at " << i << std::endl;
+                table.setQValue(state, action, 500);
                 continue;
             }
 
@@ -101,48 +169,20 @@ int main()
             table.setQValue(state, action, updatedQValue);
         }
 
-        if(END_EPSILON_DECAYING >= i && i >= START_EPSILON_DECAYING)
+        if (END_EPSILON_DECAYING >= i && i >= START_EPSILON_DECAYING)
         {
             epsilon -= epsilonDecayValue;
+            if (log)
+            {
+                std::cout << "Epsilon changed, new epsilon: " << epsilon << std::endl;
+                std::cout << epsilonDecayValue << std::endl;
+            }
         }
 
-        // if (log)
-        // {
-        //     for (size_t x = 0; x < GRID_WIDTH; x++)
-        //     {
-        //         for (size_t y = 0; y < GRID_WIDTH; y++)
-        //         {
-        //             for (size_t i = 0; i < ACTION_AMOUNT; i++)
-        //             {
-        //                 std::cout << table.getQValue(x, y, i) << ", ";
-        //             }
-        //             std::cout << "||";
-        //         }
-
-        //         std::cout << std::endl;
-        //     }
-        // }
+        // render(table, agent, grid, epsilon);
     }
 
-    // while (window.isOpen())
-    // {
-    //     sf::Event event;
-    //     while (window.pollEvent(event))
-    //     {
-    //         if (event.type == sf::Event::Closed)
-    //             window.close();
-    //     }
-
-    //     Direction action = (Direction)(rand() % 4);
-    //     agent.go(action);
-
-    //     sf::Vector2i agentPos = grid.getAgentPos();
-    //     std::cout << "State: " << vectorToString(agentPos) << "; Obstacle: " << map.isObstacle(agentPos) << std::endl;
-
-    //     window.clear();
-    //     grid.draw(window);
-    //     window.display();
-    // }
+    render(table, agent, grid, epsilon);
 
     return 0;
 }
