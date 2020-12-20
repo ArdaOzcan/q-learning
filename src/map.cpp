@@ -48,7 +48,7 @@ void Map::serialize(std::string fileName)
             ofs << obstacles[x][y];
         }
 
-        ofs << '\n';
+        ofs << std::endl;
     }
 
     ofs.close();

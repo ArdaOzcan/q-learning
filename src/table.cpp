@@ -1,4 +1,6 @@
 #include "table.hpp"
+#include <iostream>
+#include <fstream>
 
 Table::Table()
 {
@@ -57,6 +59,51 @@ int Table::getOptimalQValueIndex(int x, int y)
     return max;
 }
 
+void Table::serialize(std::string fileName)
+{
+    std::ofstream ofs(fileName);
+
+    for (int x = 0; x < GRID_WIDTH; x++)
+    {
+        for (int y = 0; y < GRID_HEIGHT; y++)
+        {
+            for (int i = 0; i < ACTION_AMOUNT; i++)
+            {
+                ofs << qTable[x][y][i] << ",";
+            }
+            ofs << std::endl;
+            
+        }
+    }
+
+    ofs.close();
+}
+
+void Table::deserialize(std::string fileName)
+{
+    std::ifstream ifs(fileName);
+    std::string line;
+    int l = 0;
+    while(getline(ifs, line))
+    {
+        std::string num = "";
+        int numIndex = 0;
+        for (int i = 0; i < line.length(); i++)
+        {
+            if(line[i] != ',') num += line[i];
+            else
+            {
+                float numFloat = std::stof(num);
+                qTable[l / GRID_WIDTH][l % GRID_WIDTH][numIndex++] = numFloat;
+                num = "";
+            }
+        }
+        l++;
+    }
+
+    ifs.close();
+}
+
 int Table::getOptimalQValueIndex(sf::Vector2i v)
 {
     return getOptimalQValueIndex(v.x, v.y);
@@ -71,7 +118,6 @@ float Table::getQValue(int x, int y, int action)
 {
     return qTable[x][y][action];
 }
-
 
 float Table::getQValue(sf::Vector2i v, Direction action)
 {

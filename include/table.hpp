@@ -9,6 +9,7 @@ private:
 
 public:
     Table();
+    
     float *getAllQValues(int x, int y);
     float *getAllQValues(sf::Vector2i v);
 
@@ -24,4 +25,7 @@ public:
     float getQValue(sf::Vector2i v, int action);
 
     void setQValue(sf::Vector2i, Direction action, float val);
+
+    void serialize(std::string fileName);
+    void deserialize(std::string fileName);
 };

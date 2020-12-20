@@ -155,7 +155,7 @@ int main()
             if (newState == target)
             {
                 episodeEnded = true;
-                if(i > EPISODES - 2500)
+                if(i > EPISODES - 100)
                     std::cout << "Got the reward at " << i << std::endl;
                 table.setQValue(state, action, 500);
                 continue;
@@ -183,6 +183,9 @@ int main()
     }
 
     render(table, agent, grid, epsilon);
+
+    table.deserialize("test.table");
+    table.serialize("test2.table");
 
     return 0;
 }
