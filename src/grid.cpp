@@ -18,6 +18,18 @@ Grid::Grid(Map map, Agent *agent)
     }
 }
 
+Grid::Grid() {}
+
+void Grid::reset()
+{
+    agent->resetPos();
+}
+
+void Grid::applyAction(Direction drc)
+{
+    agent->go(drc);
+}
+
 void Grid::draw(sf::RenderWindow &win)
 {
     for (size_t x = 0; x < GRID_WIDTH; x++)
