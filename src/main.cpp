@@ -13,7 +13,7 @@ int main()
 
     for (size_t i = 0; i < EPISODES; i++)
     {
-        qLearning.applyEpisode(false);
+        qLearning.applyEpisode(false, i == EPISODES - 1);
     }
 
     qLearning.serializeTable("test.table");

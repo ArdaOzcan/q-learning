@@ -30,7 +30,7 @@ void Grid::applyAction(Direction drc)
     agent->go(drc);
 }
 
-void Grid::draw(sf::RenderWindow &win)
+void Grid::draw(sf::RenderWindow *win)
 {
     for (size_t x = 0; x < GRID_WIDTH; x++)
     {
@@ -41,11 +41,11 @@ void Grid::draw(sf::RenderWindow &win)
                 sf::RectangleShape rect(sf::Vector2f(10, 10));
                 rect.setPosition(x * 10, y * 10);
                 rect.setFillColor(agent->getColor());
-                win.draw(rect);
+                win->draw(rect);
             }
             else
             {
-                win.draw(tiles[x][y]);
+                win->draw(tiles[x][y]);
             }
         }
     }

@@ -13,7 +13,7 @@ public:
     Grid(Map map, Agent *agent);
     Grid();
 
-    void draw(sf::RenderWindow &win);
+    void draw(sf::RenderWindow *win);
     void reset();
     void applyAction(Direction drc);
     

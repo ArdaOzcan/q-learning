@@ -24,7 +24,21 @@ void QLearning::serializeTable(std::string fileName)
     table.serialize(fileName);
 }
 
-void QLearning::applyEpisode(bool log)
+void QLearning::applyEpisode(bool log, bool render)
+{
+    if (render)
+    {
+        sf::RenderWindow win(sf::VideoMode(400, 400), "Q Learning");
+        win.setFramerateLimit(20);
+        applyEpisode(&win, log, render);
+    }
+    else
+    {
+        applyEpisode(nullptr, log, render);
+    }
+}
+
+void QLearning::applyEpisode(sf::RenderWindow *win, bool log, bool render)
 {
     grid.reset();
     bool episodeEnded = false;
@@ -69,7 +83,7 @@ void QLearning::applyEpisode(bool log)
         {
             episodeEnded = true;
             // if (counter > EPISODES - 100)
-                std::cout << "Got the reward at " << counter << std::endl;
+            std::cout << "Got the reward at " << counter << std::endl;
             table.setQValue(state, action, 500);
             continue;
         }
@@ -80,6 +94,24 @@ void QLearning::applyEpisode(bool log)
         float updatedQValue = (1 - LEARNING_RATE) * oldQ + LEARNING_RATE * (reward + DISCOUNT * (optimalNewQ));
 
         table.setQValue(state, action, updatedQValue);
+
+        if (render)
+        {
+            if (!win->isOpen())
+                break;
+            sf::Event e;
+            while (win->pollEvent(e))
+            {
+                if (e.type == sf::Event::Closed)
+                {
+                    win->close();
+                }
+            }
+            win->clear();
+            grid.draw(win);
+            // win->draw(sf::RectangleShape(sf::Vector2f(50, 50)));
+            win->display();
+        }
     }
 
     if (END_EPSILON_DECAYING >= counter && counter >= START_EPSILON_DECAYING)

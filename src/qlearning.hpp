@@ -22,6 +22,7 @@ public:
     QLearning(std::string mapPath);
 
     Table * getTable();
-    void applyEpisode(bool log = false);
+    void applyEpisode(bool log = false, bool render = false);
+    void applyEpisode(sf::RenderWindow *win, bool log = false, bool render = false);
     void serializeTable(std::string tableName);
 };
